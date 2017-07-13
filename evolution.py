@@ -13,15 +13,14 @@ class Evolution():
     self.doEvolve()
  
  def doEvolve(self):
+    evolGeneration = Generation(self.parentGeneration, self.goal, self.possibleAttributes)
     while not self.evolutionFinish:
-        for j in range(100000):
-            for i in range(12):
-                if self.newGeneration[i] == self.goal:
-                    reqTroll = self.newGeneration[i]
-                    print("The requested Troll was born!")
-                    print("fix me: name is missing " + str(reqTroll.look) + str(reqTroll.sex))
-                    self.evolutionFinisch = True
-        
-            evolGeneration = Generation(self.newGeneration, self.goal, self.possibleAttributes)     
-            self.generation = evolGeneration.sortTrolls()
-        self.evolutionFinish = True
+        survivors = evolGeneration.sortTrolls()
+        evolGeneration = Generation(survivors, self.goal, self.possibleAttributes)
+        for Troll in survivors:
+            if (Troll.look == self.goal.look) and (Troll.sex == self.goal.sex): 
+                print("The requested Troll was born!")
+                print("fix me: name is missing " + str(Troll.look) + str(Troll.sex))
+                self.evolutionFinish = True
+                break
+    

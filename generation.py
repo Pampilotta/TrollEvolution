@@ -1,4 +1,5 @@
 from random import randrange
+import random
 from random import choice
 from troll import Troll
 class Generation():
@@ -27,7 +28,7 @@ class Generation():
     while father.sex != "m" :
         randomIndex = randrange(0, len(self.parentGeneration))
         father = self.parentGeneration[randomIndex]
-        
+    
     return [mother, father]
 
  """   A method, that mixes the parents attributes randomly and re-  """
@@ -42,7 +43,12 @@ class Generation():
              lookParent= parents[randomParentsPicker].look
              lookChild[i][j] = lookParent[i][j]
      
-     lookChild = self.mutate(lookChild)
+     mutationRange = range(1, 101)
+     mutationModul = 20
+     randIndex = random.choice(mutationRange)
+     
+     if (randIndex % mutationModul) == 0:
+         lookChild = self.mutate(lookChild)
      
      randomParentsPicker = randrange(0,2)
      sexChild = parents[randomParentsPicker].sex
@@ -52,15 +58,17 @@ class Generation():
  """   Adds a random Attribute from the possible Attributes with a   """
  """   given propability                                             """
  def mutate(self, lookChild):
+     print("MUTATION: from / to\n" + str(lookChild))  
      posArea = randrange(0, 3)
      posAttribute = randrange(0, 3)
-     newAttribute = 1 
+     newAttribute = randrange(0, 3) 
      lookChild[posArea][posAttribute] = self.possibleAttributes[newAttribute]
      
+     print(str(lookChild))
      return lookChild
 
  """   A method, that produces 12 new Trolls by using the mixingDNA  """
- """   -mehtod. All random produced Trolls are returned in no order  """
+ """   -method. All random produced Trolls are returned in no order  """
  def produceGeneration(self):
     tmpRes = []
     childTrolls = []
@@ -71,7 +79,6 @@ class Generation():
         childTrolls.append(tmpRes[1])
         parentsOfChildren.append(tmpRes[0])
         
-    
     return childTrolls
 
  """   A method, that detects the similarity between every Troll in  """
@@ -85,10 +92,11 @@ class Generation():
         for j in range(3):
             for k in range(3):
                 tmp = tmp + (self.goal.look[j][k]/troll.look[j][k])
-        tmp = tmp/9
-        sim.append([tmp, trollsToProof[i]])
+        tmp = int((tmp/9)*10**6)
+        sim.append((tmp, trollsToProof[i]))
         tmp = 0
-        
+    
+    """print("Method 'similarity': #Keys = " + str(len(sim.keys())) + " #Values = " + str(len(sim.values())))"""
     return sim
 
  """   A method, that devides the old and the new Generation into    """
@@ -97,37 +105,25 @@ class Generation():
      validTrolls = []
      invalidTrolls = []
      newTrolls = self.similarity(self.newGeneration)
-     oldTrolls = self.similarity(self.parentGeneration)
+     betwixtGeneration = self.similarity(self.parentGeneration)
      
-     
-     for i in range(6):
-         comp = []
-         locMax = max(newTrolls, key=lambda item: item[0])
-         validTrolls.append(locMax[1])
-         newTrolls.remove(locMax)
-    
-     for i in range(6):
-         locMax = max(oldTrolls, key=lambda item: item[0])
-         validTrolls.append(locMax[1])
-         oldTrolls.remove(locMax)
-         
      while len(newTrolls) != 0:
-         while len(oldTrolls) != 0:
-             invalidTrolls.append(oldTrolls[0][1])
-             del oldTrolls[0]
-         invalidTrolls.append(newTrolls[0][1])
-         del newTrolls[0]
-    
-     print("Following Trolls were discarded: ")
-     for i in range(len(invalidTrolls)):
-         print(str(invalidTrolls[i].look) + ",  " + str(invalidTrolls[i].sex))
+         betwixtGeneration.append(newTrolls.pop())     
      
+     sortedTrolls = sorted(betwixtGeneration, key = lambda tup : tup[0])
+     for i in range(len(sortedTrolls)):
+         print(str(i) + ". Sorted Trolls: " + str(sortedTrolls[i][0]))
     
-     print("\n")
-     
-     print ("Valid Trolls are: ")
-     for i in range(len(validTrolls)):
-         print(str(validTrolls[i].look) + ",  " + str(validTrolls[i].sex))
-    
+     j = len(sortedTrolls)-1
+     for i in range(int(len(sortedTrolls)/2)):
+         print("Valid hinzugefügt: " + str(sortedTrolls[j][0]))
+         validTrolls.append(sortedTrolls[j][1])
+         j = j-1
+                 
+     while j >= 0:
+         print("                               Invalid hinzugefügt: " + str(sortedTrolls[j][0]))
+         invalidTrolls.append(sortedTrolls[j][1])
+         j = j-1
+
      return validTrolls
          
